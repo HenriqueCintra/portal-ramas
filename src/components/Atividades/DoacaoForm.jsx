@@ -99,13 +99,13 @@ export default function DoacaoForm({ embedded = false, entityType = '', defaultR
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const today = new Date().toISOString().split('T')[0];
     let savedSomething = false;
 
     if (formData.mudasVariedade && formData.mudasQuantidade) {
-      saveEntity('doacoes', {
+      await saveEntity('doacoes', {
         tipo: 'mudas',
         mudasVariedade: formData.mudasVariedade,
         mudasQuantidade: formData.mudasQuantidade,
@@ -119,7 +119,7 @@ export default function DoacaoForm({ embedded = false, entityType = '', defaultR
     }
 
     if (formData.alimentosVariedade && formData.alimentosQuantidade) {
-      saveEntity('doacoes', {
+      await saveEntity('doacoes', {
         tipo: 'alimentos',
         alimentosVariedade: formData.alimentosVariedade,
         alimentosQuantidade: formData.alimentosQuantidade,
@@ -131,7 +131,7 @@ export default function DoacaoForm({ embedded = false, entityType = '', defaultR
     }
 
     if (!savedSomething) {
-      saveEntity('doacoes', {
+      await saveEntity('doacoes', {
         tipo: formData.mudasVariedade ? 'mudas' : 'alimentos',
         ...formData,
         dataRegistro: today

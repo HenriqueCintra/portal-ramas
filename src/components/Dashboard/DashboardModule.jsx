@@ -9,11 +9,16 @@ import {
   Users, 
   TrendingUp, 
   TrendingDown,
-  Info
+  Info,
+  Database
 } from 'lucide-react';
 import { getEntities } from '../../utils/storage';
+import ConfigBancoPanel from './ConfigBancoPanel';
 
 export default function DashboardModule() {
+  const [activeMainTab, setActiveMainTab] = useState('analytics');
+  const [isLoading, setIsLoading] = useState(true);
+
   const [produtores, setProdutores] = useState([]);
   const [associacoes, setAssociacoes] = useState([]);
   const [prefeituras, setPrefeituras] = useState([]);
@@ -38,16 +43,45 @@ export default function DashboardModule() {
   const chartEntityRef = useRef(null);
   const chartEventRef = useRef(null);
 
-  const loadAllData = () => {
-    setProdutores(getEntities('produtor'));
-    setAssociacoes(getEntities('associacao'));
-    setPrefeituras(getEntities('prefeitura'));
-    setEscolas(getEntities('escola'));
-    setInstituicoes(getEntities('instituicao'));
-    setParceiros(getEntities('parceiro'));
-    setDoacoes(getEntities('doacoes'));
-    setTransactions(getEntities('financeiro'));
-    setEvents(getEntities('eventos'));
+  const loadAllData = async () => {
+    setIsLoading(true);
+    try {
+      const [
+        prodList,
+        assocList,
+        prefList,
+        escList,
+        instList,
+        parcList,
+        doacList,
+        txList,
+        evList
+      ] = await Promise.all([
+        getEntities('produtor'),
+        getEntities('associacao'),
+        getEntities('prefeitura'),
+        getEntities('escola'),
+        getEntities('instituicao'),
+        getEntities('parceiro'),
+        getEntities('doacoes'),
+        getEntities('financeiro'),
+        getEntities('eventos')
+      ]);
+
+      setProdutores(prodList);
+      setAssociacoes(assocList);
+      setPrefeituras(prefList);
+      setEscolas(escList);
+      setInstituicoes(instList);
+      setParceiros(parcList);
+      setDoacoes(doacList);
+      setTransactions(txList);
+      setEvents(evList);
+    } catch (e) {
+      console.error("Erro ao carregar dados no painel:", e);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -297,7 +331,65 @@ export default function DashboardModule() {
         </p>
       </div>
 
-      {/* Metric Highlights */}
+      {/* Abas de Navegação Principal */}
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem', paddingBottom: '0.5rem' }}>
+        <button
+          onClick={() => setActiveMainTab('analytics')}
+          className="btn"
+          style={{
+            background: activeMainTab === 'analytics' ? 'var(--color-primary)' : 'transparent',
+            color: activeMainTab === 'analytics' ? 'white' : 'var(--color-text-light)',
+            boxShadow: activeMainTab === 'analytics' ? 'var(--glass-shadow)' : 'none',
+            borderRadius: 'var(--radius-md)',
+            padding: '0.5rem 1rem'
+          }}
+        >
+          <BarChart3 size={18} />
+          Painel de Indicadores
+        </button>
+        <button
+          onClick={() => setActiveMainTab('config')}
+          className="btn"
+          style={{
+            background: activeMainTab === 'config' ? 'var(--color-primary)' : 'transparent',
+            color: activeMainTab === 'config' ? 'white' : 'var(--color-text-light)',
+            boxShadow: activeMainTab === 'config' ? 'var(--glass-shadow)' : 'none',
+            borderRadius: 'var(--radius-md)',
+            padding: '0.5rem 1rem'
+          }}
+        >
+          <Database size={18} />
+          Conectar Banco Online
+        </button>
+      </div>
+
+      {activeMainTab === 'analytics' ? (
+        isLoading ? (
+          <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+            <svg 
+              className="spin-animation" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="var(--color-secondary)" 
+              strokeWidth="3" 
+              style={{ width: '48px', height: '48px', margin: '0 auto 1rem auto' }}
+            >
+              <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="16" />
+            </svg>
+            <p style={{ color: 'var(--color-text-light)' }}>Carregando informações...</p>
+            <style>{`
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+              .spin-animation {
+                animation: spin 1s linear infinite;
+              }
+            `}</style>
+          </div>
+        ) : (
+          <div>
+            {/* Metric Highlights */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', background: 'rgba(27, 67, 50, 0.08)', color: 'var(--color-primary)' }}>
@@ -818,6 +910,11 @@ export default function DashboardModule() {
           </div>
         )}
       </div>
+          </div>
+        )
+      ) : (
+        <ConfigBancoPanel />
+      )}
 
       {/* Floating Interactive Tooltip */}
       {tooltip.show && (

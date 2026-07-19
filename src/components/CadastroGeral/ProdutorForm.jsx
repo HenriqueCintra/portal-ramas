@@ -46,9 +46,9 @@ export default function ProdutorForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    saveEntity('produtor', formData);
+    await saveEntity('produtor', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {

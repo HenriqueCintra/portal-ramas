@@ -46,10 +46,23 @@ export default function FinanceiroEventosModule() {
   const [showFinAlert, setShowFinAlert] = useState(false);
   const [showEvAlert, setShowEvAlert] = useState(false);
 
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
   // Load data
-  const loadData = () => {
-    setTransactions(getEntities('financeiro'));
-    setEvents(getEntities('eventos'));
+  const loadData = async () => {
+    setIsLoadingData(true);
+    try {
+      const [txs, evs] = await Promise.all([
+        getEntities('financeiro'),
+        getEntities('eventos')
+      ]);
+      setTransactions(txs);
+      setEvents(evs);
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+    } finally {
+      setIsLoadingData(false);
+    }
   };
 
   useEffect(() => {
@@ -60,7 +73,7 @@ export default function FinanceiroEventosModule() {
   }, []);
 
   // Form Submissions
-  const handleAddTransaction = (e) => {
+  const handleAddTransaction = async (e) => {
     e.preventDefault();
     if (!finValue || !finDate || !finDescription) return;
 
@@ -73,7 +86,7 @@ export default function FinanceiroEventosModule() {
       status: finStatus
     };
 
-    saveEntity('financeiro', newTx);
+    await saveEntity('financeiro', newTx);
     setShowFinAlert(true);
     setTimeout(() => setShowFinAlert(false), 3000);
 
@@ -83,7 +96,7 @@ export default function FinanceiroEventosModule() {
     setFinDescription('');
   };
 
-  const handleAddEvent = (e) => {
+  const handleAddEvent = async (e) => {
     e.preventDefault();
     if (!evTitle || !evDate || !evLocation) return;
 
@@ -101,11 +114,11 @@ export default function FinanceiroEventosModule() {
     };
 
     // Save event
-    saveEntity('eventos', newEvent);
+    await saveEntity('eventos', newEvent);
 
     // If cost > 0, auto add an expense in financeiro
     if (costVal > 0) {
-      saveEntity('financeiro', {
+      await saveEntity('financeiro', {
         tipo: 'Despesa',
         categoria: 'Evento',
         valor: costVal,
@@ -128,15 +141,15 @@ export default function FinanceiroEventosModule() {
     setEvCost('');
   };
 
-  const handleDeleteTx = (id) => {
+  const handleDeleteTx = async (id) => {
     if (window.confirm('Deseja realmente excluir esta transação?')) {
-      deleteEntity('financeiro', id);
+      await deleteEntity('financeiro', id);
     }
   };
 
-  const handleDeleteEvent = (id) => {
+  const handleDeleteEvent = async (id) => {
     if (window.confirm('Deseja realmente excluir este evento?')) {
-      deleteEntity('eventos', id);
+      await deleteEntity('eventos', id);
     }
   };
 
@@ -201,8 +214,32 @@ export default function FinanceiroEventosModule() {
           Eventos & Capacitações
         </button>
       </div>
+      {isLoadingData && (
+        <div style={{ textAlign: 'center', padding: '5rem 0' }}>
+          <svg 
+            className="spin-animation" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="var(--color-secondary)" 
+            strokeWidth="3" 
+            style={{ width: '48px', height: '48px', margin: '0 auto 1rem auto' }}
+          >
+            <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="16" />
+          </svg>
+          <p style={{ color: 'var(--color-text-light)' }}>Carregando dados financeiros e eventos...</p>
+          <style>{`
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            .spin-animation {
+              animation: spin 1s linear infinite;
+            }
+          `}</style>
+        </div>
+      )}
 
-      {activeSubTab === 'financeiro' && (
+      {!isLoadingData && activeSubTab === 'financeiro' && (
         <div>
           {/* Summary Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
@@ -459,7 +496,7 @@ export default function FinanceiroEventosModule() {
         </div>
       )}
 
-      {activeSubTab === 'eventos' && (
+      {!isLoadingData && activeSubTab === 'eventos' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', alignItems: 'start' }}>
           {/* Form Eventos */}
           <div className="glass-card" style={{ padding: '2rem' }}>

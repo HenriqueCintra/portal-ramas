@@ -18,9 +18,9 @@ export default function ParceiroForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    saveEntity('parceiro', formData);
+    await saveEntity('parceiro', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setSubmitted(false), 4000);
