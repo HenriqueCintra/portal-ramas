@@ -1,23 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gift, TreePine, Apple, CheckCircle2 } from 'lucide-react';
+import { saveEntity, getEntities } from '../../utils/storage';
 
-export default function DoacaoForm() {
+export default function DoacaoForm({ embedded = false, entityType = '', defaultRecipient = '', defaultDestination = '' }) {
   const [submitted, setSubmitted] = useState(false);
+  const [entitiesList, setEntitiesList] = useState([]);
+  const [selectedEntityId, setSelectedEntityId] = useState('');
+
   const [formData, setFormData] = useState({
     // Mudas e Sementes
     mudasVariedade: '',
     mudasQuantidade: '',
     mudasLote: '',
-    mudasLocalDestino: '',
-    mudasResponsavel: '',
+    mudasLocalDestino: defaultDestination,
+    mudasResponsavel: defaultRecipient,
     mudasPrevisaoCultivo: '',
 
     // Alimentos Biofortificados
     alimentosVariedade: '',
     alimentosQuantidade: '',
-    alimentosLocalDestino: '',
-    alimentosResponsavel: ''
+    alimentosLocalDestino: defaultDestination,
+    alimentosResponsavel: defaultRecipient
   });
+
+  const entityLabels = {
+    produtor: 'Produtor / Agricultor',
+    associacao: 'Associação / Cooperativa',
+    prefeitura: 'Prefeitura',
+    escola: 'Escola (Fund. / Médio)',
+    instituicao: 'Instituição de Pesquisa',
+    parceiro: 'Pesquisador e Parceiro'
+  };
+
+  const entityTypeLabel = entityLabels[entityType] || 'Entidade';
+
+  const getEntityName = (item) => item.nomeCompleto || item.nome;
+  const getEntityLocation = (item) => item.localizacao || item.local || '';
+
+  // Fetch list of entities of this type
+  useEffect(() => {
+    if (embedded && entityType) {
+      const list = getEntities(entityType);
+      setEntitiesList(list);
+      setSelectedEntityId('');
+    }
+  }, [entityType, embedded]);
+
+  // Listen for database changes
+  useEffect(() => {
+    const handleUpdate = (e) => {
+      if (embedded && entityType && (!e.detail || e.detail.type === entityType)) {
+        setEntitiesList(getEntities(entityType));
+      }
+    };
+    window.addEventListener('database-updated', handleUpdate);
+    return () => window.removeEventListener('database-updated', handleUpdate);
+  }, [entityType, embedded]);
+
+  const handleEntitySelect = (e) => {
+    const id = e.target.value;
+    setSelectedEntityId(id);
+    if (!id) {
+      setFormData(prev => ({
+        ...prev,
+        mudasResponsavel: defaultRecipient,
+        mudasLocalDestino: defaultDestination,
+        alimentosResponsavel: defaultRecipient,
+        alimentosLocalDestino: defaultDestination
+      }));
+      return;
+    }
+    const selected = entitiesList.find(item => item.id === id);
+    if (selected) {
+      const name = getEntityName(selected);
+      const loc = getEntityLocation(selected);
+      setFormData(prev => ({
+        ...prev,
+        mudasResponsavel: name,
+        mudasLocalDestino: loc,
+        alimentosResponsavel: name,
+        alimentosLocalDestino: loc
+      }));
+    }
+  };
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      mudasLocalDestino: defaultDestination || prev.mudasLocalDestino,
+      mudasResponsavel: defaultRecipient || prev.mudasResponsavel,
+      alimentosLocalDestino: defaultDestination || prev.alimentosLocalDestino,
+      alimentosResponsavel: defaultRecipient || prev.alimentosResponsavel
+    }));
+  }, [defaultRecipient, defaultDestination]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,20 +101,105 @@ export default function DoacaoForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const today = new Date().toISOString().split('T')[0];
+    let savedSomething = false;
+
+    if (formData.mudasVariedade && formData.mudasQuantidade) {
+      saveEntity('doacoes', {
+        tipo: 'mudas',
+        mudasVariedade: formData.mudasVariedade,
+        mudasQuantidade: formData.mudasQuantidade,
+        mudasLote: formData.mudasLote,
+        mudasLocalDestino: formData.mudasLocalDestino,
+        mudasResponsavel: formData.mudasResponsavel,
+        mudasPrevisaoCultivo: formData.mudasPrevisaoCultivo,
+        dataRegistro: today
+      });
+      savedSomething = true;
+    }
+
+    if (formData.alimentosVariedade && formData.alimentosQuantidade) {
+      saveEntity('doacoes', {
+        tipo: 'alimentos',
+        alimentosVariedade: formData.alimentosVariedade,
+        alimentosQuantidade: formData.alimentosQuantidade,
+        alimentosLocalDestino: formData.alimentosLocalDestino,
+        alimentosResponsavel: formData.alimentosResponsavel,
+        dataRegistro: today
+      });
+      savedSomething = true;
+    }
+
+    if (!savedSomething) {
+      saveEntity('doacoes', {
+        tipo: formData.mudasVariedade ? 'mudas' : 'alimentos',
+        ...formData,
+        dataRegistro: today
+      });
+    }
+
     setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!embedded) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     setTimeout(() => setSubmitted(false), 4000);
+
+    // Limpar formulário
+    setFormData({
+      mudasVariedade: '',
+      mudasQuantidade: '',
+      mudasLote: '',
+      mudasLocalDestino: defaultDestination,
+      mudasResponsavel: defaultRecipient,
+      mudasPrevisaoCultivo: '',
+      alimentosVariedade: '',
+      alimentosQuantidade: '',
+      alimentosLocalDestino: defaultDestination,
+      alimentosResponsavel: defaultRecipient
+    });
+    setSelectedEntityId('');
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Gift size={28} style={{ color: 'var(--color-secondary)' }} />
-          Doações de Materiais e Alimentos
-        </h2>
-        <p style={{ color: 'var(--color-text-light)' }}>Registro das entregas de sementes, mudas biofortificadas ou distribuição de colheitas de biofortificados.</p>
-      </div>
+      {!embedded ? (
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Gift size={28} style={{ color: 'var(--color-secondary)' }} />
+            Doações de Materiais e Alimentos
+          </h2>
+          <p style={{ color: 'var(--color-text-light)' }}>Registro das entregas de sementes, mudas biofortificadas ou distribuição de colheitas de biofortificados.</p>
+        </div>
+      ) : (
+        <div style={{ marginBottom: '1.5rem', marginTop: '2.5rem', borderTop: '1px dashed var(--color-border)', paddingTop: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Gift size={24} style={{ color: 'var(--color-secondary)' }} />
+            Registrar Doação Vinculada
+          </h2>
+          <p style={{ color: 'var(--color-text-light)', fontSize: '0.9rem' }}>Insira registros de doações associadas a esta entidade cadastrada.</p>
+        </div>
+      )}
+
+      {embedded && entitiesList.length > 0 && (
+        <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem', background: 'rgba(82, 183, 136, 0.08)', borderColor: 'rgba(82, 183, 136, 0.3)' }}>
+          <label style={{ fontWeight: 600, display: 'block', marginBottom: '0.5rem', color: 'var(--color-primary)', fontSize: '0.95rem' }}>
+            Vincular Doação a um {entityTypeLabel} Cadastrado:
+          </label>
+          <select
+            className="form-control"
+            value={selectedEntityId}
+            onChange={handleEntitySelect}
+            style={{ maxWidth: '400px', background: 'white' }}
+          >
+            <option value="">-- Selecione uma entidade --</option>
+            {entitiesList.map(ent => (
+              <option key={ent.id} value={ent.id}>
+                {getEntityName(ent)} {getEntityLocation(ent) ? `(${getEntityLocation(ent)})` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {submitted && (
         <div className="alert-success">

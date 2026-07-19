@@ -20,6 +20,8 @@ export default function Breadcrumbs() {
     consultoria: 'Consultoria Técnica',
     doacao: 'Doações',
     caderno: 'Caderno de Campo',
+    financeiro: 'Finanças e Eventos',
+    analytics: 'Dashboard e Gráficos',
   };
 
   return (

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Landmark, CheckCircle2 } from 'lucide-react';
+import { saveEntity } from '../../utils/storage';
+
 
 export default function PrefeituraForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -17,6 +19,7 @@ export default function PrefeituraForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveEntity('prefeitura', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setSubmitted(false), 4000);

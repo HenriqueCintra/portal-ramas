@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { GraduationCap, CheckCircle2 } from 'lucide-react';
+import { saveEntity } from '../../utils/storage';
+
 
 export default function EscolaForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -17,6 +19,7 @@ export default function EscolaForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveEntity('escola', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setSubmitted(false), 4000);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FolderPlus, Layers, UserCheck, CalendarDays } from 'lucide-react';
+import { FolderPlus, Layers, UserCheck, CalendarDays, Coins, BarChart3 } from 'lucide-react';
 
 export default function MainMenu() {
   return (
@@ -8,7 +8,7 @@ export default function MainMenu() {
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Painel de Controle</h1>
         <p style={{ color: 'var(--color-text-light)', fontSize: '1.1rem' }}>
-          Selecione um módulo para iniciar a coleta e gestão de dados.
+          Selecione um módulo para iniciar a coleta, análise e gestão de dados.
         </p>
       </div>
 
@@ -38,6 +38,34 @@ export default function MainMenu() {
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
             <CalendarDays size={16} /> Registros de Campo & Fluxos
+          </div>
+        </Link>
+
+        <Link to="/financeiro" className="glass-card menu-card">
+          <div className="menu-card-icon">
+            <Coins size={36} style={{ color: 'var(--color-secondary)' }} />
+          </div>
+          <h2>FINANCEIRO & EVENTOS</h2>
+          <p>
+            Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo, 
+            integrando custos automaticamente.
+          </p>
+          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+            <Coins size={16} /> Ledger de Caixa & Eventos
+          </div>
+        </Link>
+
+        <Link to="/analytics" className="glass-card menu-card">
+          <div className="menu-card-icon">
+            <BarChart3 size={36} style={{ color: 'var(--color-secondary)' }} />
+          </div>
+          <h2>DASHBOARDS & GRÁFICOS</h2>
+          <p>
+            Acompanhe o andamento geral em painéis estatísticos com gráficos interativos de doações, 
+            fluxo de caixa e adesão aos eventos.
+          </p>
+          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+            <BarChart3 size={16} /> Gráficos Interativos & Exportação
           </div>
         </Link>
       </div>

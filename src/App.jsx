@@ -9,6 +9,9 @@ import AtividadesModule from './components/Atividades/AtividadesModule';
 import ConsultoriaForm from './components/Atividades/ConsultoriaForm';
 import DoacaoForm from './components/Atividades/DoacaoForm';
 import CadernoCampoModule from './components/Atividades/CadernoCampoModule';
+import FinanceiroEventosModule from './components/FinanceiroEventos/FinanceiroEventosModule';
+import DashboardModule from './components/Dashboard/DashboardModule';
+
 
 function AppContent() {
   const location = useLocation();
@@ -65,6 +68,10 @@ function AppContent() {
           <Route path="/atividades/consultoria" element={<ConsultoriaForm />} />
           <Route path="/atividades/doacao" element={<DoacaoForm />} />
           <Route path="/atividades/caderno" element={<CadernoCampoModule />} />
+
+          {/* New Financial & Analytics Routes */}
+          <Route path="/financeiro" element={<FinanceiroEventosModule />} />
+          <Route path="/analytics" element={<DashboardModule />} />
         </Routes>
       </main>
     </div>

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Microscope, CheckCircle2 } from 'lucide-react';
+import { saveEntity } from '../../utils/storage';
+
 
 export default function InstituicaoForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -18,6 +20,7 @@ export default function InstituicaoForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveEntity('instituicao', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setSubmitted(false), 4000);

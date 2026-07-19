@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { UserCheck, CheckCircle2 } from 'lucide-react';
+import { saveEntity } from '../../utils/storage';
+
 
 export default function ParceiroForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -18,6 +20,7 @@ export default function ParceiroForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveEntity('parceiro', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => setSubmitted(false), 4000);

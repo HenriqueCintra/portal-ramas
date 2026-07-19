@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { User, TreePine, CheckCircle2 } from 'lucide-react';
+import { saveEntity } from '../../utils/storage';
+
 
 export default function ProdutorForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -46,6 +48,7 @@ export default function ProdutorForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    saveEntity('produtor', formData);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {

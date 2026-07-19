@@ -1,4 +1,5 @@
-// Utility to handle LocalStorage persistence and seeding mock data for Ramas da Esperança
+// Utility to handle LocalStorage persistence, Supabase online sync, and seeding mock data
+import { getSupabase } from './supabaseClient';
 
 const STORAGE_KEYS = {
   produtor: 'final_cadastro_produtor',
@@ -10,6 +11,18 @@ const STORAGE_KEYS = {
   doacoes: 'final_doacoes_data',
   financeiro: 'final_financeiro_transactions',
   eventos: 'final_eventos_data'
+};
+
+const TABLE_MAPPING = {
+  produtor: 'produtores',
+  associacao: 'associacoes',
+  prefeitura: 'prefeituras',
+  escola: 'escolas',
+  instituicao: 'instituicoes',
+  parceiro: 'parceiros',
+  doacoes: 'doacoes',
+  financeiro: 'financeiro',
+  eventos: 'eventos'
 };
 
 // Seed Mock Data
@@ -460,7 +473,7 @@ const MOCK_DATA = {
   ]
 };
 
-// Initialize Storage and Seed
+// Initialize Storage and Seed Locally
 export function initStorage() {
   Object.entries(STORAGE_KEYS).forEach(([key, storageKey]) => {
     if (!localStorage.getItem(storageKey)) {
@@ -469,12 +482,13 @@ export function initStorage() {
   });
 }
 
-// Ensure seeding happens automatically
+// Automatically trigger local initialization
 if (typeof window !== 'undefined') {
   initStorage();
 }
 
-export function getEntities(type) {
+// --- HELPER FUNCTIONS FOR LOCAL STORAGE FALLBACK ---
+function getLocalEntities(type) {
   const storageKey = STORAGE_KEYS[type];
   if (!storageKey) return [];
   try {
@@ -484,35 +498,168 @@ export function getEntities(type) {
   }
 }
 
-export function saveEntity(type, data) {
+function saveLocalEntity(type, record) {
   const storageKey = STORAGE_KEYS[type];
   if (!storageKey) return;
   try {
-    const list = getEntities(type);
-    const newEntry = {
-      id: data.id || `${type.substring(0, 3)}_${Date.now()}`,
-      ...data
-    };
-    list.push(newEntry);
+    const list = getLocalEntities(type);
+    const existingIndex = list.findIndex(item => item.id === record.id);
+    if (existingIndex > -1) {
+      list[existingIndex] = record;
+    } else {
+      list.push(record);
+    }
     localStorage.setItem(storageKey, JSON.stringify(list));
-    
-    // Notify application of database changes
-    window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
-    return newEntry;
   } catch (e) {
-    console.error('Failed to save entity', e);
+    console.error('Failed to save locally:', e);
   }
 }
 
-export function deleteEntity(type, id) {
+function deleteLocalEntity(type, id) {
   const storageKey = STORAGE_KEYS[type];
   if (!storageKey) return;
   try {
-    const list = getEntities(type);
+    const list = getLocalEntities(type);
     const filtered = list.filter(item => item.id !== id);
     localStorage.setItem(storageKey, JSON.stringify(filtered));
-    window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
   } catch (e) {
-    console.error('Failed to delete entity', e);
+    console.error('Failed to delete locally:', e);
   }
+}
+
+// --- PUBLIC ASYNC API (DYNAMIC DUAL-MODE) ---
+
+export async function getEntities(type) {
+  const supabase = getSupabase();
+  if (supabase) {
+    const tableName = TABLE_MAPPING[type] || type;
+    try {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select('*');
+      
+      if (error) {
+        console.warn(`Supabase read failed for ${type}, fallback to localStorage:`, error.message);
+        return getLocalEntities(type);
+      }
+      // Cache values locally for offline use
+      const storageKey = STORAGE_KEYS[type];
+      if (storageKey && data) {
+        localStorage.setItem(storageKey, JSON.stringify(data));
+      }
+      return data || [];
+    } catch (e) {
+      console.warn(`Network error fetching ${type}, fallback to localStorage:`, e);
+      return getLocalEntities(type);
+    }
+  }
+  return getLocalEntities(type);
+}
+
+export async function saveEntity(type, data) {
+  const supabase = getSupabase();
+  const entryId = data.id || `${type.substring(0, 3)}_${Date.now()}`;
+  const record = { ...data, id: entryId };
+  
+  // Clean values for Postgres constraints (e.g. parse numbers)
+  if (type === 'financeiro' && typeof record.valor === 'string') {
+    record.valor = parseFloat(record.valor);
+  }
+  if (type === 'eventos') {
+    if (typeof record.participantes === 'string') record.participantes = parseInt(record.participantes) || 0;
+    if (typeof record.custo === 'string') record.custo = parseFloat(record.custo) || 0;
+  }
+
+  if (supabase) {
+    const tableName = TABLE_MAPPING[type] || type;
+    try {
+      const { data: savedData, error } = await supabase
+        .from(tableName)
+        .upsert([record], { onConflict: 'id' })
+        .select();
+      
+      if (error) {
+        console.warn(`Supabase upsert failed for ${type}, fallback to localStorage:`, error.message);
+        saveLocalEntity(type, record);
+      } else {
+        saveLocalEntity(type, record);
+        window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+        return savedData ? savedData[0] : record;
+      }
+    } catch (e) {
+      console.warn(`Network error on save for ${type}, fallback to localStorage:`, e);
+      saveLocalEntity(type, record);
+    }
+  } else {
+    saveLocalEntity(type, record);
+  }
+  
+  window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+  return record;
+}
+
+export async function deleteEntity(type, id) {
+  const supabase = getSupabase();
+  if (supabase) {
+    const tableName = TABLE_MAPPING[type] || type;
+    try {
+      const { error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        console.warn(`Supabase delete failed for ${type}, fallback to localStorage:`, error.message);
+        deleteLocalEntity(type, id);
+      } else {
+        deleteLocalEntity(type, id);
+      }
+    } catch (e) {
+      console.warn(`Network error on delete for ${type}, fallback to localStorage:`, e);
+      deleteLocalEntity(type, id);
+    }
+  } else {
+    deleteLocalEntity(type, id);
+  }
+  window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+}
+
+// Bulk sync local cache datasets up to Supabase Cloud
+export async function syncLocalToCloud() {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Supabase não configurado.");
+  
+  const results = {};
+  
+  for (const [type, tableName] of Object.entries(TABLE_MAPPING)) {
+    const localData = getLocalEntities(type);
+    if (localData.length === 0) continue;
+    
+    // Clean data formats to avoid SQL insert crashes
+    const cleanedData = localData.map(item => {
+      const copy = { ...item };
+      if (type === 'financeiro' && typeof copy.valor === 'string') {
+        copy.valor = parseFloat(copy.valor) || 0;
+      }
+      if (type === 'eventos') {
+        if (typeof copy.participantes === 'string') copy.participantes = parseInt(copy.participantes) || 0;
+        if (typeof copy.custo === 'string') copy.custo = parseFloat(copy.custo) || 0;
+      }
+      return copy;
+    });
+
+    const { error } = await supabase
+      .from(tableName)
+      .upsert(cleanedData, { onConflict: 'id' });
+      
+    if (error) {
+      console.error(`Erro ao sincronizar tabela ${tableName}:`, error.message);
+      throw new Error(`Falha ao sincronizar a tabela ${tableName}: ${error.message}`);
+    }
+    results[type] = cleanedData.length;
+  }
+  
+  // Refresh UI
+  window.dispatchEvent(new CustomEvent('database-updated'));
+  return results;
 }

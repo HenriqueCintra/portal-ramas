@@ -6,6 +6,8 @@ import PrefeituraForm from './PrefeituraForm';
 import EscolaForm from './EscolaForm';
 import InstituicaoForm from './InstituicaoForm';
 import ParceiroForm from './ParceiroForm';
+import DoacaoForm from '../Atividades/DoacaoForm';
+
 
 export default function CadastroGeralModule() {
   const [activeTab, setActiveTab] = useState('produtor');
@@ -59,8 +61,9 @@ export default function CadastroGeralModule() {
       </aside>
 
       {/* Área Principal do Formulário Selecionado */}
-      <div className="cadastro-content">
+      <div className="cadastro-content" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {renderForm()}
+        <DoacaoForm embedded={true} entityType={activeTab} />
       </div>
     </div>
   );
