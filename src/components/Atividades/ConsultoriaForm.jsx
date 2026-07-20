@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ShieldCheck, Upload, Trash2, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { getEntities, saveEntity } from '../../utils/storage';
 
 export default function ConsultoriaForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -18,6 +19,34 @@ export default function ConsultoriaForm() {
     bolsistaResponsavel: '',
     pesquisadorResponsavel: ''
   });
+
+  // Load last saved Consultoria Técnica on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getEntities('consultoria');
+        if (data && data.length > 0) {
+          const latest = data[data.length - 1];
+          setFormData({
+            id: latest.id,
+            local: latest.local || '',
+            responsavelLocal: latest.responsavelLocal || '',
+            tamanhoArea: latest.tamanhoArea || '',
+            sistemaIrrigacao: latest.sistemaIrrigacao || '',
+            variedades: latest.variedades || '',
+            etapasManejo: latest.etapasManejo || '',
+            cronogramaPresencial: latest.cronogramaPresencial || '',
+            cronogramaDistancia: latest.cronogramaDistancia || '',
+            bolsistaResponsavel: latest.bolsistaResponsavel || '',
+            pesquisadorResponsavel: latest.pesquisadorResponsavel || ''
+          });
+        }
+      } catch (e) {
+        console.error("Erro ao carregar consultoria do banco:", e);
+      }
+    };
+    loadData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,10 +74,17 @@ export default function ConsultoriaForm() {
     setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    try {
+      await saveEntity('consultoria', formData);
+    } catch (e) {
+      console.error("Erro ao salvar consultoria no banco:", e);
+    }
+    
     setTimeout(() => setSubmitted(false), 4000);
   };
 

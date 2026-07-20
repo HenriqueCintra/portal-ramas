@@ -19,11 +19,11 @@ export default function MainMenu() {
           </div>
           <h2>CADASTRO GERAL</h2>
           <p>
-            Gerencie e cadastre produtores/agricultores, cooperativas, prefeituras, escolas, 
+            Gerencie e cadastre produtores/agricultores, cooperativas, prefeituras, escolas,
             instituições de pesquisa e parceiros integrados ao projeto.
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <UserCheck size={16} /> 6 Módulos de Entidade
+            <UserCheck size={16} />
           </div>
         </Link>
 
@@ -33,11 +33,11 @@ export default function MainMenu() {
           </div>
           <h2>ATIVIDADES</h2>
           <p>
-            Lance consultorias técnicas, gerencie a doação de mudas/sementes e alimentos biofortificados, 
+            Lance consultorias técnicas, gerencie a doação de mudas/sementes e alimentos biofortificados,
             ou preencha os registros detalhados do Caderno de Campo.
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <CalendarDays size={16} /> Registros de Campo & Fluxos
+            <CalendarDays size={16} />
           </div>
         </Link>
 
@@ -47,11 +47,10 @@ export default function MainMenu() {
           </div>
           <h2>FINANCEIRO & EVENTOS</h2>
           <p>
-            Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo, 
-            integrando custos automaticamente.
+            Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <Coins size={16} /> Ledger de Caixa & Eventos
+            <Coins size={16} />
           </div>
         </Link>
 
@@ -61,11 +60,10 @@ export default function MainMenu() {
           </div>
           <h2>DASHBOARDS & GRÁFICOS</h2>
           <p>
-            Acompanhe o andamento geral em painéis estatísticos com gráficos interativos de doações, 
-            fluxo de caixa e adesão aos eventos.
+
           </p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <BarChart3 size={16} /> Gráficos Interativos & Exportação
+            <BarChart3 size={16} />
           </div>
         </Link>
       </div>

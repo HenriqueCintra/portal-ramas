@@ -19,7 +19,7 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    
+
     // Simulate login validation delay
     setTimeout(() => {
       setIsLoading(false);
@@ -35,8 +35,8 @@ export default function LoginScreen() {
           <div style={{ display: 'inline-flex', padding: '1rem', background: 'rgba(82, 183, 136, 0.15)', borderRadius: '50%', marginBottom: '1rem', color: 'var(--color-primary)' }}>
             <Sprout size={40} className="brand-icon" />
           </div>
-          <h1>Ramas da Esperança</h1>
-          <p>Portal de Gestão e Coleta Agroecológica</p>
+          <h1>Nas Ramas da Esperança</h1>
+          <p>Portal de Controle e Gestão</p>
         </div>
 
         <form onSubmit={handleSubmit}>

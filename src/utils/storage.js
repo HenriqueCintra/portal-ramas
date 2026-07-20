@@ -10,7 +10,9 @@ const STORAGE_KEYS = {
   parceiro: 'final_cadastro_parceiro',
   doacoes: 'final_doacoes_data',
   financeiro: 'final_financeiro_transactions',
-  eventos: 'final_eventos_data'
+  eventos: 'final_eventos_data',
+  caderno: 'final_caderno_campo_data',
+  consultoria: 'final_consultoria_data'
 };
 
 const TABLE_MAPPING = {
@@ -22,7 +24,9 @@ const TABLE_MAPPING = {
   parceiro: 'parceiros',
   doacoes: 'doacoes',
   financeiro: 'financeiro',
-  eventos: 'eventos'
+  eventos: 'eventos',
+  caderno: 'caderno_campo',
+  consultoria: 'consultoria'
 };
 
 // Seed Mock Data

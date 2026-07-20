@@ -248,6 +248,36 @@ CREATE TABLE IF NOT EXISTS eventos (
   custo NUMERIC
 );
 
+-- 10. Tabela de Caderno de Campo
+CREATE TABLE IF NOT EXISTS caderno_campo (
+  id TEXT PRIMARY KEY,
+  area JSONB DEFAULT '{}'::jsonb,
+  parcelas JSONB DEFAULT '[]'::jsonb,
+  tratos JSONB DEFAULT '[]'::jsonb,
+  meteorologia JSONB DEFAULT '[]'::jsonb,
+  irrigacao JSONB DEFAULT '[]'::jsonb,
+  nutricao JSONB DEFAULT '[]'::jsonb,
+  pragas JSONB DEFAULT '[]'::jsonb,
+  doencas JSONB DEFAULT '[]'::jsonb,
+  agrotoxicos JSONB DEFAULT '[]'::jsonb,
+  colheita JSONB DEFAULT '[]'::jsonb
+);
+
+-- 11. Tabela de Consultoria Técnica
+CREATE TABLE IF NOT EXISTS consultoria (
+  id TEXT PRIMARY KEY,
+  local TEXT,
+  "responsavelLocal" TEXT,
+  "tamanhoArea" TEXT,
+  "sistemaIrrigacao" TEXT,
+  variedades TEXT,
+  "etapasManejo" TEXT,
+  "cronogramaPresencial" TEXT,
+  "cronogramaDistancia" TEXT,
+  "bolsistaResponsavel" TEXT,
+  "pesquisadorResponsavel" TEXT
+);
+
 -- ======================================================
 -- CONFIGURAÇÃO DE SEGURANÇA E POLÍTICAS RLS (Row Level Security)
 -- ======================================================
@@ -264,6 +294,8 @@ ALTER TABLE parceiros ENABLE ROW LEVEL SECURITY;
 ALTER TABLE doacoes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financeiro ENABLE ROW LEVEL SECURITY;
 ALTER TABLE eventos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE caderno_campo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE consultoria ENABLE ROW LEVEL SECURITY;
 
 -- Criar Políticas para permitir leitura e gravação anônima (anon / publishable key)
 CREATE POLICY "Permitir acesso anon para produtores" ON produtores FOR ALL TO anon USING (true) WITH CHECK (true);
@@ -275,6 +307,8 @@ CREATE POLICY "Permitir acesso anon para parceiros" ON parceiros FOR ALL TO anon
 CREATE POLICY "Permitir acesso anon para doacoes" ON doacoes FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir acesso anon para financeiro" ON financeiro FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir acesso anon para eventos" ON eventos FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para caderno_campo" ON caderno_campo FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para consultoria" ON consultoria FOR ALL TO anon USING (true) WITH CHECK (true);
 `;
 
   const copyToClipboard = () => {

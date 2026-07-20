@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle2, Save } from 'lucide-react';
+import { getEntities, saveEntity } from '../../utils/storage';
 import Step1_Area from './steps/Step1_Area';
 import Step2_Parcelas from './steps/Step2_Parcelas';
 import Step3_Tratos from './steps/Step3_Tratos';
@@ -28,6 +29,34 @@ export default function CadernoCampoModule() {
     agrotoxicos: [],
     colheita: []
   });
+
+  // Load last saved Caderno de Campo on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getEntities('caderno');
+        if (data && data.length > 0) {
+          const latest = data[data.length - 1];
+          setFormData({
+            id: latest.id,
+            area: latest.area || {},
+            parcelas: latest.parcelas || [],
+            tratos: latest.tratos || [],
+            meteorologia: latest.meteorologia || [],
+            irrigacao: latest.irrigacao || [],
+            nutricao: latest.nutricao || [],
+            pragas: latest.pragas || [],
+            doencas: latest.doencas || [],
+            agrotoxicos: latest.agrotoxicos || [],
+            colheita: latest.colheita || []
+          });
+        }
+      } catch (e) {
+        console.error("Erro ao carregar caderno de campo do banco:", e);
+      }
+    };
+    loadData();
+  }, []);
 
   const handleStepDataChange = (stepKey, data) => {
     setFormData((prev) => ({
@@ -61,14 +90,17 @@ export default function CadernoCampoModule() {
     }
   };
 
-  const handleFinish = (e) => {
+  const handleFinish = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Save to localStorage for mock persistence
-    localStorage.setItem('caderno_campo_data', JSON.stringify(formData));
-    
+
+    try {
+      await saveEntity('caderno', formData);
+    } catch (e) {
+      console.error("Erro ao salvar caderno de campo no banco:", e);
+    }
+
     setTimeout(() => {
       setSubmitted(false);
     }, 5000);
@@ -174,7 +206,7 @@ export default function CadernoCampoModule() {
         {stepsInfo.map((step) => {
           const isCurrent = activeStep === step.num;
           const isCompleted = activeStep > step.num;
-          
+
           return (
             <button
               key={step.num}
