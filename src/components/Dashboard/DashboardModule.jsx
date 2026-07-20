@@ -141,6 +141,30 @@ export default function DashboardModule() {
 
   const monthlyFinances = getMonthlyFinances();
 
+  const maxFinValue = Math.max(
+    ...monthlyFinances.map(m => Math.max(m.receita, m.despesa)),
+    1000
+  );
+  
+  const getRoundedMax = (val) => {
+    if (val <= 1000) return 1000;
+    if (val <= 5000) return 5000;
+    if (val <= 10000) return 10000;
+    if (val <= 20000) return 20000;
+    if (val <= 50000) return 50000;
+    if (val <= 100000) return 100000;
+    return Math.ceil(val / 50000) * 50000;
+  };
+  
+  const roundedMaxFin = getRoundedMax(maxFinValue);
+
+  const formatFinanceLabel = (val) => {
+    if (val >= 1000) {
+      return (val / 1000).toFixed(0) + 'k';
+    }
+    return val.toString();
+  };
+
   // Chart 2: Top Donation Varieties (counts of donations)
   const getDonationVarietyCounts = () => {
     const varietyMap = {};
@@ -181,6 +205,23 @@ export default function DashboardModule() {
   };
 
   const eventAttendance = getEventsAttendance();
+
+  const maxAttendeesValue = Math.max(
+    ...eventAttendance.map(e => e.count),
+    10
+  );
+
+  const getRoundedMaxAttendees = (val) => {
+    if (val <= 10) return 10;
+    if (val <= 25) return 25;
+    if (val <= 50) return 50;
+    if (val <= 100) return 100;
+    if (val <= 250) return 250;
+    if (val <= 500) return 500;
+    return Math.ceil(val / 100) * 100;
+  };
+
+  const roundedMaxAttendees = getRoundedMaxAttendees(maxAttendeesValue);
 
   // Download Chart Functions
   const triggerDownload = (fileName, dataUrl) => {
@@ -469,25 +510,23 @@ export default function DashboardModule() {
                 style={{ width: '100%', height: '100%' }}
               >
                 {/* Horizontal grid lines */}
-                <line x1="40" y1="40" x2="480" y2="40" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="40" y1="90" x2="480" y2="90" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="40" y1="140" x2="480" y2="140" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="40" y1="190" x2="480" y2="190" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="40" y1="50" x2="480" y2="50" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="40" y1="100" x2="480" y2="100" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="40" y1="150" x2="480" y2="150" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
                 
                 {/* Base Axis */}
                 <line x1="40" y1="200" x2="480" y2="200" stroke="var(--color-text-light)" strokeWidth="1.5" />
                 
                 {/* Y-Axis Label limits */}
-                <text x="35" y="45" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">15k</text>
-                <text x="35" y="95" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">10k</text>
-                <text x="35" y="145" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">5k</text>
-                <text x="35" y="195" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">0</text>
+                <text x="35" y="53" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">{formatFinanceLabel(roundedMaxFin)}</text>
+                <text x="35" y="103" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">{formatFinanceLabel(roundedMaxFin * 2 / 3)}</text>
+                <text x="35" y="153" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">{formatFinanceLabel(roundedMaxFin / 3)}</text>
+                <text x="35" y="203" fill="var(--color-text-muted)" fontSize="9" textAnchor="end">0</text>
 
                 {monthlyFinances.map((item, idx) => {
                   const x = 50 + idx * 70;
-                  // Max range is 15000
-                  const heightRec = Math.min((item.receita / 15000) * 150, 150);
-                  const heightDes = Math.min((item.despesa / 15000) * 150, 150);
+                  const heightRec = (item.receita / roundedMaxFin) * 150;
+                  const heightDes = (item.despesa / roundedMaxFin) * 150;
                   
                   return (
                     <g key={item.label}>
@@ -724,24 +763,23 @@ export default function DashboardModule() {
                 style={{ width: '100%', height: '100%' }}
               >
                 {/* Grid lines */}
-                <line x1="50" y1="40" x2="450" y2="40" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="50" y1="90" x2="450" y2="90" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="50" y1="140" x2="450" y2="140" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
-                <line x1="50" y1="190" x2="450" y2="190" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="50" y1="50" x2="450" y2="50" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="50" y1="100" x2="450" y2="100" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
+                <line x1="50" y1="150" x2="450" y2="150" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 4" />
                 
                 <line x1="50" y1="200" x2="450" y2="200" stroke="var(--color-text-light)" strokeWidth="1.5" />
                 
-                <text x="45" y="45" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">100</text>
-                <text x="45" y="95" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">75</text>
-                <text x="45" y="145" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">50</text>
-                <text x="45" y="195" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">25</text>
+                <text x="45" y="53" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">{roundedMaxAttendees.toFixed(0)}</text>
+                <text x="45" y="103" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">{(roundedMaxAttendees * 2 / 3).toFixed(0)}</text>
+                <text x="45" y="153" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">{(roundedMaxAttendees / 3).toFixed(0)}</text>
+                <text x="45" y="203" fill="var(--color-text-muted)" fontSize="8" textAnchor="end">0</text>
 
                 {/* Plotting Line */}
                 {(() => {
                   const points = eventAttendance.map((item, idx) => {
                     const step = 400 / Math.max(eventAttendance.length - 1, 1);
                     const x = 50 + idx * step;
-                    const y = 200 - (item.count / 100) * 160; // scale max 100 participants
+                    const y = 200 - (item.count / roundedMaxAttendees) * 150;
                     return `${x},${y}`;
                   }).join(' ');
 
@@ -759,7 +797,7 @@ export default function DashboardModule() {
                 {eventAttendance.map((item, idx) => {
                   const step = 400 / Math.max(eventAttendance.length - 1, 1);
                   const x = 50 + idx * step;
-                  const y = 200 - (item.count / 100) * 160;
+                  const y = 200 - (item.count / roundedMaxAttendees) * 150;
                   
                   return (
                     <g key={item.label}>

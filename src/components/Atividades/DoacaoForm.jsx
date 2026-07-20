@@ -39,18 +39,28 @@ export default function DoacaoForm({ embedded = false, entityType = '', defaultR
 
   // Fetch list of entities of this type
   useEffect(() => {
+    let active = true;
     if (embedded && entityType) {
-      const list = getEntities(entityType);
-      setEntitiesList(list);
+      getEntities(entityType).then(list => {
+        if (active) {
+          setEntitiesList(list);
+        }
+      });
       setSelectedEntityId('');
+    } else {
+      setEntitiesList([]);
     }
+    return () => {
+      active = false;
+    };
   }, [entityType, embedded]);
 
   // Listen for database changes
   useEffect(() => {
-    const handleUpdate = (e) => {
+    const handleUpdate = async (e) => {
       if (embedded && entityType && (!e.detail || e.detail.type === entityType)) {
-        setEntitiesList(getEntities(entityType));
+        const list = await getEntities(entityType);
+        setEntitiesList(list);
       }
     };
     window.addEventListener('database-updated', handleUpdate);

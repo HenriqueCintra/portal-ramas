@@ -247,6 +247,34 @@ CREATE TABLE IF NOT EXISTS eventos (
   participantes INTEGER,
   custo NUMERIC
 );
+
+-- ======================================================
+-- CONFIGURAÇÃO DE SEGURANÇA E POLÍTICAS RLS (Row Level Security)
+-- ======================================================
+-- Como o Supabase ativa RLS por padrão, você precisa liberar acesso para a chave anon (Publishable Key).
+-- Execute os comandos abaixo para habilitar o RLS e criar as políticas públicas de acesso total.
+
+-- Habilitar RLS em todas as tabelas
+ALTER TABLE produtores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE associacoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE prefeituras ENABLE ROW LEVEL SECURITY;
+ALTER TABLE escolas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE instituicoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parceiros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE doacoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financeiro ENABLE ROW LEVEL SECURITY;
+ALTER TABLE eventos ENABLE ROW LEVEL SECURITY;
+
+-- Criar Políticas para permitir leitura e gravação anônima (anon / publishable key)
+CREATE POLICY "Permitir acesso anon para produtores" ON produtores FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para associacoes" ON associacoes FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para prefeituras" ON prefeituras FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para escolas" ON escolas FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para instituicoes" ON instituicoes FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para parceiros" ON parceiros FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para doacoes" ON doacoes FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para financeiro" ON financeiro FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para eventos" ON eventos FOR ALL TO anon USING (true) WITH CHECK (true);
 `;
 
   const copyToClipboard = () => {
