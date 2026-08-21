@@ -2,6 +2,23 @@ import React, { useState } from 'react';
 import { UserCheck, CheckCircle2 } from 'lucide-react';
 import { saveEntity } from '../../utils/storage';
 
+const formatCPF = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  let masked = '';
+  if (digits.length > 0) {
+    masked += digits.substring(0, 3);
+  }
+  if (digits.length > 3) {
+    masked += '.' + digits.substring(3, 6);
+  }
+  if (digits.length > 6) {
+    masked += '.' + digits.substring(6, 9);
+  }
+  if (digits.length > 9) {
+    masked += '-' + digits.substring(9, 11);
+  }
+  return masked;
+};
 
 export default function ParceiroForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -14,7 +31,10 @@ export default function ParceiroForm() {
   });
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'cpf') {
+      value = formatCPF(value);
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 

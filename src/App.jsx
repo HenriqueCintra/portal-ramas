@@ -1,46 +1,126 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { Sprout, LogOut, User } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Sprout, LogOut, GraduationCap, BookOpen } from 'lucide-react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Breadcrumbs from './components/Common/Breadcrumbs';
 import LoginScreen from './components/LoginScreen';
 import MainMenu from './components/MainMenu';
 import CadastroGeralModule from './components/CadastroGeral/CadastroGeralModule';
 import AtividadesModule from './components/Atividades/AtividadesModule';
 import ConsultoriaForm from './components/Atividades/ConsultoriaForm';
+import ConsultoriaInteligenteModule from './components/Atividades/ConsultoriaInteligenteModule';
 import DoacaoForm from './components/Atividades/DoacaoForm';
 import CadernoCampoModule from './components/Atividades/CadernoCampoModule';
 import FinanceiroEventosModule from './components/FinanceiroEventos/FinanceiroEventosModule';
 import DashboardModule from './components/Dashboard/DashboardModule';
+import InventarioModule from './components/Inventario/InventarioModule';
 
+// Guard de rota: exige login e verifica permissão
+function ProtectedRoute({ children, route }) {
+  const { user, canAccess } = useAuth();
+
+  if (!user) return <Navigate to="/" replace />;
+
+  if (route && !canAccess(route)) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '50vh',
+          gap: '1rem',
+          textAlign: 'center',
+          padding: '2rem',
+        }}
+      >
+        <div
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            background: '#fee2e2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '2rem',
+          }}
+        >
+          🔒
+        </div>
+        <h2 style={{ color: 'var(--color-danger)' }}>Acesso Restrito</h2>
+        <p style={{ color: 'var(--color-text-light)', maxWidth: 420 }}>
+          Seu perfil (<strong>Bolsista</strong>) não tem permissão para acessar este módulo.
+          Entre em contato com o Professor Orientador.
+        </p>
+      </div>
+    );
+  }
+
+  return children;
+}
 
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const isLoginPage = location.pathname === '/';
 
   const handleLogout = () => {
-    // Clear storage if needed and navigate to Login
+    logout();
     navigate('/');
+  };
+
+  const getRoleIcon = () => {
+    if (!user) return null;
+    if (user.role === 'professor') return <GraduationCap size={16} />;
+    return <BookOpen size={16} />;
   };
 
   return (
     <div className="app-container">
-      {/* Conditionally render header based on current route */}
+      {/* Header */}
       {!isLoginPage && (
         <header className="app-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+            onClick={() => navigate('/dashboard')}
+          >
             <Sprout className="brand-icon" size={24} style={{ color: 'var(--color-secondary)' }} />
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--color-primary)' }}>
+            <span
+              style={{
+                fontSize: '1.25rem',
+                fontWeight: 800,
+                fontFamily: 'var(--font-display)',
+                color: 'var(--color-primary)',
+              }}
+            >
               Ramas da Esperança
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: 'var(--color-text-light)' }}>
-              <User size={18} style={{ color: 'var(--color-secondary)' }} />
-              <span>Técnico de Campo</span>
-            </div>
-            
+            {user && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '999px',
+                  background: user.bgColor,
+                  color: user.color,
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                }}
+              >
+                {getRoleIcon()}
+                <span>{user.label}</span>
+                <span style={{ opacity: 0.6, fontSize: '0.8rem' }}>— {user.name}</span>
+              </div>
+            )}
+
             <button
               onClick={handleLogout}
               className="btn btn-secondary btn-sm"
@@ -55,23 +135,99 @@ function AppContent() {
 
       {/* Main viewport */}
       <main className="app-main">
-        {/* Render Breadcrumbs only if logged in */}
         {!isLoginPage && <Breadcrumbs />}
 
         <Routes>
           <Route path="/" element={<LoginScreen />} />
-          <Route path="/dashboard" element={<MainMenu />} />
-          <Route path="/cadastro" element={<CadastroGeralModule />} />
-          
-          {/* Activities Module and sub-routes */}
-          <Route path="/atividades" element={<AtividadesModule />} />
-          <Route path="/atividades/consultoria" element={<ConsultoriaForm />} />
-          <Route path="/atividades/doacao" element={<DoacaoForm />} />
-          <Route path="/atividades/caderno" element={<CadernoCampoModule />} />
 
-          {/* New Financial & Analytics Routes */}
-          <Route path="/financeiro" element={<FinanceiroEventosModule />} />
-          <Route path="/analytics" element={<DashboardModule />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainMenu />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/cadastro"
+            element={
+              <ProtectedRoute>
+                <CadastroGeralModule />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Activities */}
+          <Route
+            path="/atividades"
+            element={
+              <ProtectedRoute>
+                <AtividadesModule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/atividades/consultoria"
+            element={
+              <ProtectedRoute>
+                <ConsultoriaForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/atividades/consultoria-inteligente"
+            element={
+              <ProtectedRoute>
+                <ConsultoriaInteligenteModule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/atividades/doacao"
+            element={
+              <ProtectedRoute>
+                <DoacaoForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/atividades/caderno"
+            element={
+              <ProtectedRoute>
+                <CadernoCampoModule />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Financeiro — rota protegida por perfil */}
+          <Route
+            path="/financeiro"
+            element={
+              <ProtectedRoute route="/financeiro">
+                <FinanceiroEventosModule />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <DashboardModule />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Inventário — novo */}
+          <Route
+            path="/inventario"
+            element={
+              <ProtectedRoute>
+                <InventarioModule />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
     </div>
@@ -81,7 +237,9 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }

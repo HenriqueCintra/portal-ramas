@@ -1,8 +1,45 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { FolderPlus, Layers, UserCheck, CalendarDays, Coins, BarChart3 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  FolderPlus,
+  Layers,
+  UserCheck,
+  CalendarDays,
+  Coins,
+  BarChart3,
+  Package,
+  Lock,
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+function LockedCard({ icon, title, description, reason }) {
+  return (
+    <div className="glass-card menu-card menu-card-locked" tabIndex={0}>
+      {/* Lock badge */}
+      <div className="lock-badge">
+        <Lock size={14} />
+        Acesso Restrito
+      </div>
+
+      <div className="menu-card-icon menu-card-icon-locked">{icon}</div>
+      <h2 style={{ opacity: 0.55 }}>{title}</h2>
+      <p style={{ opacity: 0.55 }}>{description}</p>
+
+      {/* Blocked overlay message */}
+      <div className="locked-info">
+        <Lock size={18} />
+        <span>{reason}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function MainMenu() {
+  const { canAccess, user } = useAuth();
+  const navigate = useNavigate();
+
+  const financeiroLocked = !canAccess('/financeiro');
+
   return (
     <div style={{ padding: '1rem 0' }}>
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -13,6 +50,7 @@ export default function MainMenu() {
       </div>
 
       <div className="menu-grid">
+        {/* Cadastro Geral */}
         <Link to="/cadastro" className="glass-card menu-card">
           <div className="menu-card-icon">
             <FolderPlus size={36} />
@@ -27,6 +65,7 @@ export default function MainMenu() {
           </div>
         </Link>
 
+        {/* Atividades */}
         <Link to="/atividades" className="glass-card menu-card">
           <div className="menu-card-icon">
             <Layers size={36} />
@@ -41,29 +80,52 @@ export default function MainMenu() {
           </div>
         </Link>
 
-        <Link to="/financeiro" className="glass-card menu-card">
-          <div className="menu-card-icon">
-            <Coins size={36} style={{ color: 'var(--color-secondary)' }} />
-          </div>
-          <h2>FINANCEIRO & EVENTOS</h2>
-          <p>
-            Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo
-          </p>
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <Coins size={16} />
-          </div>
-        </Link>
+        {/* Financeiro & Eventos — condicional */}
+        {financeiroLocked ? (
+          <LockedCard
+            icon={<Coins size={36} />}
+            title="FINANCEIRO & EVENTOS"
+            description="Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo"
+            reason="Disponível apenas para o perfil Professor"
+          />
+        ) : (
+          <Link to="/financeiro" className="glass-card menu-card">
+            <div className="menu-card-icon">
+              <Coins size={36} style={{ color: 'var(--color-secondary)' }} />
+            </div>
+            <h2>FINANCEIRO & EVENTOS</h2>
+            <p>
+              Controle receitas e despesas do projeto e gerencie eventos e capacitações de campo
+            </p>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+              <Coins size={16} />
+            </div>
+          </Link>
+        )}
 
+        {/* Dashboards */}
         <Link to="/analytics" className="glass-card menu-card">
           <div className="menu-card-icon">
             <BarChart3 size={36} style={{ color: 'var(--color-secondary)' }} />
           </div>
           <h2>DASHBOARDS & GRÁFICOS</h2>
-          <p>
-
-          </p>
+          <p>Visualize relatórios e análises dos dados coletados em campo.</p>
           <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
             <BarChart3 size={16} />
+          </div>
+        </Link>
+
+        {/* Inventário — novo módulo */}
+        <Link to="/inventario" className="glass-card menu-card">
+          <div className="menu-card-icon">
+            <Package size={36} style={{ color: 'var(--color-accent)' }} />
+          </div>
+          <h2>INVENTÁRIO</h2>
+          <p>
+            Cadastre e controle ferramentas, sementes, mudas, equipamentos e insumos disponíveis no projeto.
+          </p>
+          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+            <Package size={16} />
           </div>
         </Link>
       </div>

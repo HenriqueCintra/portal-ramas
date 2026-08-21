@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardCheck, Gift, CalendarRange, ArrowRight } from 'lucide-react';
+import { ClipboardCheck, Gift, CalendarRange, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function AtividadesModule() {
   const navigate = useNavigate();
@@ -12,6 +12,14 @@ export default function AtividadesModule() {
       description: 'Lançar vistorias de campo, recomendações de manejo e anexar fotos das lavouras.',
       path: '/atividades/consultoria',
       icon: <ClipboardCheck size={24} />
+    },
+    {
+      id: 'consultoria-inteligente',
+      title: 'Consultoria Inteligente (IA)',
+      description: 'Diagnosticar pragas e doenças com IA enviando fotos, áudios e vídeos.',
+      path: '/atividades/consultoria-inteligente',
+      icon: <Sparkles size={24} />,
+      isComplex: true
     },
     {
       id: 'doacao',
@@ -26,7 +34,7 @@ export default function AtividadesModule() {
       description: 'Preencher a planilha de acompanhamento completo em etapas estruturadas.',
       path: '/atividades/caderno',
       icon: <CalendarRange size={24} />,
-      isComplex: true
+      isComplex: false
     }
   ];
 

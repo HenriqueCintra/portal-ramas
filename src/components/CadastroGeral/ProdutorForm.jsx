@@ -2,6 +2,23 @@ import React, { useState } from 'react';
 import { User, TreePine, CheckCircle2 } from 'lucide-react';
 import { saveEntity } from '../../utils/storage';
 
+const formatCPF = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  let masked = '';
+  if (digits.length > 0) {
+    masked += digits.substring(0, 3);
+  }
+  if (digits.length > 3) {
+    masked += '.' + digits.substring(3, 6);
+  }
+  if (digits.length > 6) {
+    masked += '.' + digits.substring(6, 9);
+  }
+  if (digits.length > 9) {
+    masked += '-' + digits.substring(9, 11);
+  }
+  return masked;
+};
 
 export default function ProdutorForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -14,6 +31,8 @@ export default function ProdutorForm() {
     telefone: '',
     rendaMensal: '',
     estadoCivil: '',
+    sexo: '',
+    idade: '',
     integrantesFamilia: '',
     atividadePrincipal: '',
     atividadeSecundaria: '',
@@ -30,7 +49,10 @@ export default function ProdutorForm() {
   });
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'cpf') {
+      value = formatCPF(value);
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -156,6 +178,31 @@ export default function ProdutorForm() {
                 <option value="Viúvo(a)">Viúvo(a)</option>
                 <option value="União Estável">União Estável</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label>Sexo</label>
+              <select name="sexo" className="form-control" value={formData.sexo} onChange={handleInputChange}>
+                <option value="">Selecione...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Outro">Outro</option>
+                <option value="Prefiro não informar">Prefiro não informar</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Idade</label>
+              <input
+                type="number"
+                name="idade"
+                className="form-control"
+                value={formData.idade}
+                onChange={handleInputChange}
+                placeholder="Idade do produtor"
+                min="0"
+                max="120"
+              />
             </div>
 
             <div className="form-group">

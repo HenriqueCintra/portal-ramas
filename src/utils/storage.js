@@ -12,7 +12,8 @@ const STORAGE_KEYS = {
   financeiro: 'final_financeiro_transactions',
   eventos: 'final_eventos_data',
   caderno: 'final_caderno_campo_data',
-  consultoria: 'final_consultoria_data'
+  consultoria: 'final_consultoria_data',
+  consultoria_inteligente: 'final_consultoria_inteligente_data'
 };
 
 const TABLE_MAPPING = {
@@ -26,7 +27,8 @@ const TABLE_MAPPING = {
   financeiro: 'financeiro',
   eventos: 'eventos',
   caderno: 'caderno_campo',
-  consultoria: 'consultoria'
+  consultoria: 'consultoria',
+  consultoria_inteligente: 'consultoria_inteligente'
 };
 
 // Seed Mock Data
@@ -41,6 +43,8 @@ const MOCK_DATA = {
       telefone: '(87) 99122-3344',
       rendaMensal: 'R$ 1.500,00',
       estadoCivil: 'Casado',
+      sexo: 'Masculino',
+      idade: 45,
       integrantesFamilia: '4',
       atividadePrincipal: 'Agricultura Familiar',
       atividadeSecundaria: 'Pecuária de Subsistência',
@@ -62,6 +66,8 @@ const MOCK_DATA = {
       telefone: '(87) 99877-6655',
       rendaMensal: 'R$ 1.200,00',
       estadoCivil: 'Viúva',
+      sexo: 'Feminino',
+      idade: 62,
       integrantesFamilia: '2',
       atividadePrincipal: 'Agricultura Familiar',
       atividadeSecundaria: 'Artesanato',
@@ -83,6 +89,8 @@ const MOCK_DATA = {
       telefone: '(87) 98877-1122',
       rendaMensal: 'R$ 1.800,00',
       estadoCivil: 'Casado',
+      sexo: 'Masculino',
+      idade: 58,
       integrantesFamilia: '5',
       atividadePrincipal: 'Agricultura Familiar',
       atividadeSecundaria: 'Apicultura',
@@ -104,6 +112,8 @@ const MOCK_DATA = {
       telefone: '(87) 99654-7890',
       rendaMensal: 'R$ 2.500,00',
       estadoCivil: 'Solteira',
+      sexo: 'Feminino',
+      idade: 31,
       integrantesFamilia: '3',
       atividadePrincipal: 'Pecuária Leiteira',
       atividadeSecundaria: 'Agricultura Familiar',
@@ -125,6 +135,8 @@ const MOCK_DATA = {
       telefone: '(87) 99123-4567',
       rendaMensal: 'R$ 2.000,00',
       estadoCivil: 'Casado',
+      sexo: 'Masculino',
+      idade: 39,
       integrantesFamilia: '4',
       atividadePrincipal: 'Horticultura',
       atividadeSecundaria: 'Piscicultura',
@@ -474,6 +486,68 @@ const MOCK_DATA = {
       custo: 1500.00,
       tipo: 'Reunião Técnica'
     }
+  ],
+  consultoria_inteligente: [
+    {
+      id: 'ci1',
+      cultura: 'Mandioca BRS Kiriris',
+      problema: 'Manchas amarelas nas folhas superiores e enrugamento. Algumas folhas estão caindo prematuramente.',
+      midias: [
+        { id: 'm1', name: 'folhas_amarelas.jpg', type: 'image/jpeg', url: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=400&q=80' }
+      ],
+      status: 'Concluído',
+      created_at: '2026-07-28T14:32:00Z',
+      resultado: {
+        diagnostico: 'Mosaico Comum da Mandioca (CVD)',
+        confianca: 92,
+        severidade: 'Alto',
+        causas: [
+          'Presença de mosca-branca (Bemisia tabaci) transmissora do vírus.',
+          'Uso de manivas-semente contaminadas na implantação da cultura.',
+          'Ferramentas de poda não esterilizadas.'
+        ],
+        recomendacoes: [
+          'Eliminação imediata (arranquio e queima) das plantas com sintomas severos.',
+          'Utilização exclusiva de manivas-semente sadias com certificação.',
+          'Controle populacional de mosca-branca com caldas naturais (ex: óleo de neem ou calda de fumo).'
+        ],
+        proximosPassos: [
+          'Vistoriar as parcelas vizinhas diariamente.',
+          'Aplicar óleo de neem 1% nas plantas suscetíveis no final de tarde.',
+          'Higienizar ferramentas com água sanitária a 10% entre cortes.'
+        ],
+        observacoes: 'A variedade BRS Kiriris possui certa tolerância, mas em condições favoráveis ao vetor, a infecção pode se espalhar rapidamente.'
+      }
+    },
+    {
+      id: 'ci2',
+      cultura: 'Milho Biofortificado BRS Sertanejo',
+      problema: 'Folhas com furos lineares e presença de lagartas pequenas no cartucho.',
+      midias: [
+        { id: 'm2', name: 'cartucho_milho.jpg', type: 'image/jpeg', url: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?auto=format&fit=crop&w=400&q=80' }
+      ],
+      status: 'Concluído',
+      created_at: '2026-07-27T09:15:00Z',
+      resultado: {
+        diagnostico: 'Lagarta-do-cartucho (Spodoptera frugiperda)',
+        confianca: 95,
+        severidade: 'Médio',
+        causas: [
+          'Condições de clima quente e seco que favorecem o ciclo reprodutivo da praga.',
+          'Ausência de rotação de culturas ou barreiras ecológicas.'
+        ],
+        recomendacoes: [
+          'Aplicação de defensivo biológico à base de Bacillus thuringiensis (Bt).',
+          'Liberação de inimigos naturais como tesourinhas (Doru luteipes) se disponíveis.',
+          'Pulverização com extrato concentrado de folha de nim.'
+        ],
+        proximosPassos: [
+          'Monitorar a área de plantio focando no cartucho do milho.',
+          'Adquirir e aplicar o Bt conforme dosagem indicada pelo fabricante.'
+        ],
+        observacoes: 'Recomenda-se realizar a aplicação preferencialmente no final da tarde, direcionando o jato de pulverização para o cartucho das plantas.'
+      }
+    }
   ]
 };
 
@@ -498,6 +572,7 @@ function getLocalEntities(type) {
   try {
     return JSON.parse(localStorage.getItem(storageKey)) || [];
   } catch (e) {
+    console.warn('Erro ao ler do LocalStorage:', e);
     return [];
   }
 }

@@ -144,6 +144,8 @@ CREATE TABLE IF NOT EXISTS produtores (
   telefone TEXT,
   "rendaMensal" TEXT,
   "estadoCivil" TEXT,
+  sexo TEXT,
+  idade INTEGER,
   "integrantesFamilia" TEXT,
   "atividadePrincipal" TEXT,
   "atividadeSecundaria" TEXT,
@@ -278,6 +280,17 @@ CREATE TABLE IF NOT EXISTS consultoria (
   "pesquisadorResponsavel" TEXT
 );
 
+-- 12. Tabela de Consultoria Inteligente (IA)
+CREATE TABLE IF NOT EXISTS consultoria_inteligente (
+  id TEXT PRIMARY KEY,
+  cultura TEXT NOT NULL,
+  problema TEXT,
+  midias JSONB DEFAULT '[]'::jsonb,
+  status TEXT DEFAULT 'Pendente',
+  resultado JSONB DEFAULT '{}'::jsonb,
+  "created_at" TEXT
+);
+
 -- ======================================================
 -- CONFIGURAÇÃO DE SEGURANÇA E POLÍTICAS RLS (Row Level Security)
 -- ======================================================
@@ -296,6 +309,7 @@ ALTER TABLE financeiro ENABLE ROW LEVEL SECURITY;
 ALTER TABLE eventos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE caderno_campo ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consultoria ENABLE ROW LEVEL SECURITY;
+ALTER TABLE consultoria_inteligente ENABLE ROW LEVEL SECURITY;
 
 -- Criar Políticas para permitir leitura e gravação anônima (anon / publishable key)
 CREATE POLICY "Permitir acesso anon para produtores" ON produtores FOR ALL TO anon USING (true) WITH CHECK (true);
@@ -309,6 +323,7 @@ CREATE POLICY "Permitir acesso anon para financeiro" ON financeiro FOR ALL TO an
 CREATE POLICY "Permitir acesso anon para eventos" ON eventos FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir acesso anon para caderno_campo" ON caderno_campo FOR ALL TO anon USING (true) WITH CHECK (true);
 CREATE POLICY "Permitir acesso anon para consultoria" ON consultoria FOR ALL TO anon USING (true) WITH CHECK (true);
+CREATE POLICY "Permitir acesso anon para consultoria_inteligente" ON consultoria_inteligente FOR ALL TO anon USING (true) WITH CHECK (true);
 `;
 
   const copyToClipboard = () => {

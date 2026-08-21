@@ -759,3 +759,179 @@ h1, h2, h3, h4, h5, h6 {
   gap: 1rem;
   margin-top: 2rem;
 }
+
+/* ============================================
+   Login — Profile Badges hint
+   ============================================ */
+.login-profiles-hint {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.login-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.professor-badge {
+  background: rgba(27, 67, 50, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(27, 67, 50, 0.2);
+}
+
+.bolsista-badge {
+  background: rgba(217, 119, 6, 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+/* ============================================
+   Menu — Locked Card (Bolsista restriction)
+   ============================================ */
+.menu-card-locked {
+  position: relative;
+  cursor: not-allowed;
+  opacity: 0.75;
+  overflow: hidden;
+}
+
+.menu-card-locked:hover {
+  transform: none !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-color: var(--color-border) !important;
+}
+
+.menu-card-icon-locked {
+  color: var(--color-text-muted) !important;
+  background: rgba(156, 163, 175, 0.12) !important;
+}
+
+.menu-card-locked:hover .menu-card-icon-locked {
+  background: rgba(156, 163, 175, 0.12) !important;
+  color: var(--color-text-muted) !important;
+  transform: none !important;
+}
+
+.lock-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.locked-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(239, 68, 68, 0.06);
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+/* ============================================
+   Inventário — Modal & Action Buttons
+   ============================================ */
+.inv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fade-in 0.2s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.inv-modal {
+  max-width: 620px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slide-up 0.25s ease;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.inv-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inv-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+}
+
+.inv-close-btn:hover {
+  background: #fee2e2;
+  color: var(--color-danger);
+}
+
+.inv-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  color: var(--color-text-muted);
+}
+
+.inv-action-btn.inv-edit:hover {
+  background: rgba(82, 183, 136, 0.12);
+  color: var(--color-primary-light);
+}
+
+.inv-action-btn.inv-delete:hover {
+  background: #fee2e2;
+  color: var(--color-danger);
+}
