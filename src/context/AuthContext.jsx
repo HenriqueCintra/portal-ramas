@@ -26,7 +26,14 @@ const USERS = [
     color: '#d97706',
     bgColor: 'rgba(217, 119, 6, 0.12)',
     // Módulos bloqueados
-    blockedRoutes: ['/financeiro'],
+    blockedRoutes: [
+      '/financeiro',
+      '/cadastro',
+      '/inventario',
+      '/atividades/consultoria',
+      '/atividades/consultoria-inteligente',
+      '/atividades/doacao',
+    ],
   },
 ];
 

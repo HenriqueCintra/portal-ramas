@@ -51,7 +51,7 @@ function ProtectedRoute({ children, route }) {
         </div>
         <h2 style={{ color: 'var(--color-danger)' }}>Acesso Restrito</h2>
         <p style={{ color: 'var(--color-text-light)', maxWidth: 420 }}>
-          Seu perfil (<strong>Bolsista</strong>) não tem permissão para acessar este módulo.
+          Seu perfil (<strong>{user.label}</strong>) não tem permissão para acessar este módulo.
           Entre em contato com o Professor Orientador.
         </p>
       </div>
@@ -152,7 +152,7 @@ function AppContent() {
           <Route
             path="/cadastro"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute route="/cadastro">
                 <CadastroGeralModule />
               </ProtectedRoute>
             }
@@ -170,7 +170,7 @@ function AppContent() {
           <Route
             path="/atividades/consultoria"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute route="/atividades/consultoria">
                 <ConsultoriaForm />
               </ProtectedRoute>
             }
@@ -178,7 +178,7 @@ function AppContent() {
           <Route
             path="/atividades/consultoria-inteligente"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute route="/atividades/consultoria-inteligente">
                 <ConsultoriaInteligenteModule />
               </ProtectedRoute>
             }
@@ -186,7 +186,7 @@ function AppContent() {
           <Route
             path="/atividades/doacao"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute route="/atividades/doacao">
                 <DoacaoForm />
               </ProtectedRoute>
             }
@@ -223,7 +223,7 @@ function AppContent() {
           <Route
             path="/inventario"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute route="/inventario">
                 <InventarioModule />
               </ProtectedRoute>
             }

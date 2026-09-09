@@ -51,19 +51,28 @@ export default function MainMenu() {
 
       <div className="menu-grid">
         {/* Cadastro Geral */}
-        <Link to="/cadastro" className="glass-card menu-card">
-          <div className="menu-card-icon">
-            <FolderPlus size={36} />
-          </div>
-          <h2>CADASTRO GERAL</h2>
-          <p>
-            Gerencie e cadastre produtores/agricultores, cooperativas, prefeituras, escolas,
-            instituições de pesquisa e parceiros integrados ao projeto.
-          </p>
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <UserCheck size={16} />
-          </div>
-        </Link>
+        {!canAccess('/cadastro') ? (
+          <LockedCard
+            icon={<FolderPlus size={36} />}
+            title="CADASTRO GERAL"
+            description="Gerencie e cadastre produtores/agricultores, cooperativas, prefeituras, escolas, instituições de pesquisa e parceiros integrados ao projeto."
+            reason="Disponível apenas para o perfil Professor"
+          />
+        ) : (
+          <Link to="/cadastro" className="glass-card menu-card">
+            <div className="menu-card-icon">
+              <FolderPlus size={36} />
+            </div>
+            <h2>CADASTRO GERAL</h2>
+            <p>
+              Gerencie e cadastre produtores/agricultores, cooperativas, prefeituras, escolas,
+              instituições de pesquisa e parceiros integrados ao projeto.
+            </p>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+              <UserCheck size={16} />
+            </div>
+          </Link>
+        )}
 
         {/* Atividades */}
         <Link to="/atividades" className="glass-card menu-card">
@@ -116,18 +125,27 @@ export default function MainMenu() {
         </Link>
 
         {/* Inventário — novo módulo */}
-        <Link to="/inventario" className="glass-card menu-card">
-          <div className="menu-card-icon">
-            <Package size={36} style={{ color: 'var(--color-accent)' }} />
-          </div>
-          <h2>INVENTÁRIO</h2>
-          <p>
-            Cadastre e controle ferramentas, sementes, mudas, equipamentos e insumos disponíveis no projeto.
-          </p>
-          <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
-            <Package size={16} />
-          </div>
-        </Link>
+        {!canAccess('/inventario') ? (
+          <LockedCard
+            icon={<Package size={36} />}
+            title="INVENTÁRIO"
+            description="Cadastre e controle ferramentas, sementes, mudas, equipamentos e insumos disponíveis no projeto."
+            reason="Disponível apenas para o perfil Professor"
+          />
+        ) : (
+          <Link to="/inventario" className="glass-card menu-card">
+            <div className="menu-card-icon">
+              <Package size={36} style={{ color: 'var(--color-accent)' }} />
+            </div>
+            <h2>INVENTÁRIO</h2>
+            <p>
+              Cadastre e controle ferramentas, sementes, mudas, equipamentos e insumos disponíveis no projeto.
+            </p>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--color-primary-light)', fontWeight: 600 }}>
+              <Package size={16} />
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   );

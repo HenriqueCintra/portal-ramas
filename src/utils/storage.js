@@ -639,7 +639,7 @@ export async function saveEntity(type, data) {
   const supabase = getSupabase();
   const entryId = data.id || `${type.substring(0, 3)}_${Date.now()}`;
   const record = { ...data, id: entryId };
-  
+
   // Clean values for Postgres constraints (e.g. parse numbers)
   if (type === 'financeiro' && typeof record.valor === 'string') {
     record.valor = parseFloat(record.valor);
@@ -648,6 +648,61 @@ export async function saveEntity(type, data) {
     if (typeof record.participantes === 'string') record.participantes = parseInt(record.participantes) || 0;
     if (typeof record.custo === 'string') record.custo = parseFloat(record.custo) || 0;
   }
+
+  // ── Caderno de Campo ──────────────────────────────────────────────────────
+  // APPEND-ONLY: every save generates a brand-new ID so records accumulate
+  // in the table (no data is ever overwritten).
+  if (type === 'caderno') {
+    const JSONB_ARRAY_KEYS = [
+      'parcelas', 'tratos', 'meteorologia', 'irrigacao',
+      'nutricao', 'pragas', 'doencas', 'agrotoxicos', 'colheita',
+    ];
+
+    // Always a fresh ID — never reuse the previous record's id
+    const freshId = `cad_${Date.now()}`;
+    const savedAt = new Date().toISOString();
+
+    const cleanedRecord = {
+      id: freshId,
+      saved_at: savedAt,
+      area: record.area && typeof record.area === 'object' ? record.area : {},
+    };
+
+    JSONB_ARRAY_KEYS.forEach((key) => {
+      cleanedRecord[key] = Array.isArray(record[key]) ? record[key] : [];
+    });
+
+    // Save locally (accumulate in the array as well)
+    saveLocalEntity(type, { ...cleanedRecord });
+
+    if (supabase) {
+      const tableName = TABLE_MAPPING[type]; // 'caderno_campo'
+      try {
+        const { data: savedData, error } = await supabase
+          .from(tableName)
+          .insert([cleanedRecord])   // INSERT — never overwrites
+          .select();
+
+        if (error) {
+          console.error('Supabase insert caderno failed:', error.message, error.details);
+          window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+          return cleanedRecord;
+        }
+
+        window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+        return savedData ? savedData[0] : cleanedRecord;
+      } catch (e) {
+        console.error('Network error on caderno insert:', e);
+        window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+        return cleanedRecord;
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
+    return cleanedRecord;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
 
   if (supabase) {
     const tableName = TABLE_MAPPING[type] || type;
@@ -676,6 +731,7 @@ export async function saveEntity(type, data) {
   window.dispatchEvent(new CustomEvent('database-updated', { detail: { type } }));
   return record;
 }
+
 
 export async function deleteEntity(type, id) {
   const supabase = getSupabase();
